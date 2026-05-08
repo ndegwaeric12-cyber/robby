@@ -9,20 +9,26 @@ const app = express();
 const PORT = process.env.PORT || 10000;
 
 app.use(cors());
-app.get('/', (req, res) => res.send('Vanguard Robot Backend Running ✅'));
+
+// HTTP Routes
+app.get('/', (req, res) => res.send('Robby Robot Backend Running ✅'));
 app.get('/health', (req, res) => res.status(200).send('OK'));
 
 const server = app.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`);
 });
 
-const wss = new WebSocketServer({ server });
+// ====================== WEBSOCKET WITH SPECIFIC PATH ======================
+const wss = new WebSocketServer({ 
+  server,
+  path: "/robby-ws"        // ← This is the path we are setting
+});
 
 const devices = new Map();
 const controllers = new Set();
 
-wss.on('connection', (ws) => {
-  console.log('New client connected');
+wss.on('connection', (ws, req) => {
+  console.log(`New client connected on path: ${req.url}`);
 
   ws.on('message', (rawData) => {
     try {
@@ -62,4 +68,4 @@ wss.on('connection', (ws) => {
   controllers.add(ws);
 });
 
-console.log("Vanguard WebSocket Server Started");
+console.log("Robby WebSocket Server Started on path /robby-ws");
